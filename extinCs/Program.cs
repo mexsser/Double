@@ -8,6 +8,7 @@ namespace datetype
 {
     public delegate void SetTag();
     public delegate double Rel(List<Double> parents_);
+
     public class Double
     {
         public event SetTag Publisher;  // as a list of Refresh() foctors of children
@@ -15,6 +16,7 @@ namespace datetype
         private List<Double> parents = new List<Double>();
         private bool Tag = true;
         private double _val = 0.0;
+
         public double Val
         {
             get
@@ -26,10 +28,15 @@ namespace datetype
                 }
                 return _val;
             }
-            private set
+            set
             {
-                _val = value;
-                Publisher?.Invoke();
+                if (parents.Count == 0)
+                {
+                    _val = value;
+                    Publisher?.Invoke();
+                }
+                else
+                    Console.WriteLine("Current element isn't base, set operation will be omitted.");
             }
         }
 
@@ -39,17 +46,20 @@ namespace datetype
             Val = d1;
             Tag = false;
         }
+
         public void Settag()
         {
             Tag = true;
             Publisher?.Invoke();
         }
+
         public void Release()
         {
-            Val = Val;
-            if(parents.Count != 0)
-            { 
-                foreach(var parent in parents)
+            if (parents.Count != 0)
+            {
+                _val = Cal(parents);
+                Tag = false;
+                foreach (var parent in parents)
                     parent.Publisher -= new SetTag(this.Settag);
                 parents = new List<Double>();
             }
@@ -61,39 +71,57 @@ namespace datetype
                 foreach (var parent in parents)
                     parent.Publisher += new SetTag(this.Settag);
         }
-        public static Double operator +(Double D1, Double D2)
+
+        private static Double Operator_builder(Double D1, Double D2, Func<List<Double>, double> Op)
         {
             Double D3 = new Double { parents = new List<Double> { D1, D2 } };
             D3.Subscribe();
-
-            double Plus(List<Double> parents_)
-            {
-                return parents_[0].Val + parents_[1].Val;
-            }
-
-            D3.Cal += new Rel(Plus);
+            D3.Cal += new Rel(Op);
             return D3;
+        }
+
+        public static Double operator +(Double D1, Double D2)
+        {
+            double Plus(List<Double> parents_) => parents_[0].Val + parents_[1].Val;
+            return Operator_builder(D1, D2, Plus);
+        }
+
+        public static Double operator -(Double D1, Double D2)
+        {
+            double Minus(List<Double> parents_) => parents_[0].Val - parents_[1].Val;
+            return Operator_builder(D1, D2, Minus);
+        }
+        public static Double operator *(Double D1, Double D2)
+        {
+            double Product(List<Double> parents_) => parents_[0].Val * parents_[1].Val;
+            return Operator_builder(D1, D2, Product);
+        }
+
+        public static Double operator /(Double D1, Double D2)
+        {
+            double Divide(List<Double> parents_) => parents_[0].Val / parents_[1].Val;
+            return Operator_builder(D1, D2, Divide);
         }
 
         public static void Main(string[] args)
         {
+            Double D0 = new Double(0.0);
             Double D1 = new Double(1.0);
             Double D2 = new Double(2.0);
             Double D3 = new Double(3.0);
             Double D4 = D1 + D2;
             Double D5 = D3 + D4;
+            Double D6 = D5 / D1;
+            Double D7 = D6 * D2;
 
-            Console.WriteLine("Round 1: {0}", D5.Val);
+            Console.WriteLine("Round 1: {0}", D7.Val);
             D2.Val = 3;
-            Console.WriteLine("Round 2: {0}", D5.Val);
+            Console.WriteLine("Round 2: {0}", D7.Val);
             D5.Release();
-            D2.Val = 4;
-            Console.WriteLine("Round 3: {0}", D5.Val);
+            D3.Val = 4;
+            Console.WriteLine("Round 3: {0}", D7.Val);
             Console.ReadKey();
         }
-
-
-
 
     }
 }
