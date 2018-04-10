@@ -85,7 +85,6 @@ namespace datetype
             double Plus(List<Double> parents_) => parents_[0].Val + parents_[1].Val;
             return Operator_builder(D1, D2, Plus);
         }
-
         public static Double operator -(Double D1, Double D2)
         {
             double Minus(List<Double> parents_) => parents_[0].Val - parents_[1].Val;
@@ -96,10 +95,9 @@ namespace datetype
             double Product(List<Double> parents_) => parents_[0].Val * parents_[1].Val;
             return Operator_builder(D1, D2, Product);
         }
-
         public static Double operator /(Double D1, Double D2)
         {
-            double Divide(List<Double> parents_) => parents_[0].Val / parents_[1].Val;
+            double Divide(List<Double> parents_) => parents_[0].Val / parents_[1].Val; // if divided by zero, will return infinity instead of error.
             return Operator_builder(D1, D2, Divide);
         }
 
@@ -109,7 +107,7 @@ namespace datetype
             Double D1 = new Double(1.0);
             Double D2 = new Double(2.0);
             Double D3 = new Double(3.0);
-            Double D4 = D1 + D2;
+            Double D4 = D1 + D2; // "=" does a reference type assignment
             Double D5 = D3 + D4;
             Double D6 = D5 / D1;
             Double D7 = D6 * D2;
