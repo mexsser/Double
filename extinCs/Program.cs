@@ -80,6 +80,12 @@ namespace datetype
             return D3;
         }
 
+        // implicit cast double to Double will allow the operators to handle both double- and Double-typed operands, even symmetrically.
+        public static implicit operator Double(double d) 
+        {
+            return new Double(d);
+        }
+
         public static Double operator +(Double D1, Double D2)
         {
             double Plus(List<Double> parents_) => parents_[0].Val + parents_[1].Val;
@@ -107,10 +113,10 @@ namespace datetype
             Double D1 = new Double(1.0);
             Double D2 = new Double(2.0);
             Double D3 = new Double(3.0);
-            Double D4 = D1 + D2; // "=" does a reference type assignment
+            Double D4 = D1 + 2; // "=" does a reference type assignment
             Double D5 = D3 + D4;
-            Double D6 = D5 / D1;
-            Double D7 = D6 * D2;
+            Double D6 = D5 / D2;
+            Double D7 = D6 * 1.6;
 
             Console.WriteLine("Round 1: {0}", D7.Val);
             D2.Val = 3;
